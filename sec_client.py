@@ -18,6 +18,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
     first_val = data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"][0]["val"] #store the value of the first record in a variable
     print(f"Net Income: ${first_val:,}")
 
-
     for record in data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"][:5]: #loop through first 5 records in USD and print the value of each record
-        print(record["start"], record["end"], record["val"], record["filed"])
+        start = date.fromisoformat(record["start"]) #convert the start date from string to date format
+        end = date.fromisoformat(record["end"]) 
+        duration = (end - start).days
+        print(record["start"], record["end"], duration)
