@@ -17,8 +17,6 @@ def get_data(cik):
 
 if __name__ == "__main__": #this is the main function that runs when code is executed 
     data = get_data(320193)
-    first_val = data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"][0]["val"] #store the value of the first record in a variable
-    print(f"Net Income: ${first_val:,}")
 
     annual_records = get_annual_records(data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"]) #get the annual records from the data
     unique_periods = get_unique_periods(annual_records) #get the unique periods from the annual records
@@ -38,3 +36,24 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Annualized earnings growth: unavailable")
     else:
         print(f"Annualized earnings growth: {growth:.2%}")
+    
+    
+    revenue_records = data["facts"]["us-gaap"]["RevenueFromContractWithCustomerExcludingAssessedTax"]["units"]["USD"]
+    annual_revenue = get_annual_records(revenue_records)
+    unique_revenue = get_unique_periods(annual_revenue)
+    print("Unique annual revenue periods:", len(unique_revenue))
+
+    for period in latest_five:
+        if period in unique_revenue:
+            record = unique_revenue[period]
+            print(record["start"], record["end"], f"${record["val"]:,}")
+        else:
+            print("Missing revenue for:", period)
+    
+    first_revenue = unique_revenue[latest_five[0]]["val"]
+    last_revenue = unique_revenue[latest_five[-1]]["val"]
+    revenue_growth = CAGR(first_revenue, last_revenue, len(latest_five) - 1)
+    if revenue_growth is None:
+        print("Annualized revenue growth: unavailable")
+    else:
+        print(f"Annualized revenue growth: {revenue_growth:.2%}")
