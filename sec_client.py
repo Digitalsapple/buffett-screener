@@ -1,7 +1,7 @@
 import os
 import requests
 from datetime import date
-from metrics import CAGR, net_profit_margin
+from metrics import CAGR, net_profit_margin, calculate_std_dev
 from financials import get_annual_records, get_unique_periods
 
 def get_data(cik):
@@ -67,3 +67,21 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Net profit margin: unavailable")
     else:
         print(f"Net profit margin: {margin:.2%}")
+    
+
+    margins = []
+    for period in latest_five:
+        income = unique_periods[period]["val"]
+        revenue = unique_revenue[period]["val"]
+        margin = net_profit_margin(income, revenue)
+        margins.append(margin)
+        if margin is None:
+            print(f"{period[1]}, Margin unavailable")
+        else:
+            print(f"{period[1]} Margin: {margin:.2%}")
+    
+    consistency = calculate_std_dev(margins)
+    if consistency is None:
+        print("Margin consistency: unavailable")
+    else:
+        print(f"Margin consistency (std dev): {consistency * 100:.2f} percentage points")
