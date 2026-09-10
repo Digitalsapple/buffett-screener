@@ -2,6 +2,7 @@ import os
 import requests
 from datetime import date
 from metrics import CAGR
+from financials import get_annual_records, get_unique_periods
 
 def get_data(cik):
     contact = os.environ.get("EMAIL_CONTACT") #contact info is read from the environment variable EMAIL_CONTACT and stored in var "contact"
@@ -19,23 +20,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
     first_val = data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"][0]["val"] #store the value of the first record in a variable
     print(f"Net Income: ${first_val:,}")
 
-    annual_records = []
-
-    for record in data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"]: #loop through records in USD and print the value of each record
-        start = date.fromisoformat(record["start"]) #convert the start date from string to date format
-        end = date.fromisoformat(record["end"])
-        duration = (end - start).days
-        if 330 <= duration <= 380:
-            annual_records.append(record)
-
-    unique_periods = {} #dictionary
-
-    for record in annual_records:
-        period = (record["start"], record["end"]) #tuple of start and end dates
-        if period not in unique_periods:
-            unique_periods[period] = record #add new key and value
-        elif record["filed"] > unique_periods[period]["filed"]: #if it IS already in the dictionary
-            unique_periods[period] = record #update the value if the filed date is more recent
+    annual_records = get_annual_records(data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"]) #get the annual records from the data
+    unique_periods = get_unique_periods(annual_records) #get the unique periods from the annual records
     
     sorted_periods = sorted(unique_periods)
     latest_five = sorted_periods[-5:] #get the last five periods
@@ -51,4 +37,4 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
     if growth is None:
         print("Annualized earnings growth: unavailable")
     else:
-        print(f"Annualized earnings growth: {growth:.2%}") 
+        print(f"Annualized earnings growth: {growth:.2%}")
