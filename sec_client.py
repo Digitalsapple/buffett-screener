@@ -1,7 +1,7 @@
 import os
 import requests
 from datetime import date
-from metrics import CAGR
+from metrics import CAGR, net_profit_margin
 from financials import get_annual_records, get_unique_periods
 
 def get_data(cik):
@@ -57,3 +57,13 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Annualized revenue growth: unavailable")
     else:
         print(f"Annualized revenue growth: {revenue_growth:.2%}")
+
+    
+    latest_period = latest_five[-1]
+    income = unique_periods[latest_period]["val"]
+    revenue = unique_revenue[latest_period]["val"]
+    margin = net_profit_margin(income, revenue)
+    if margin is None:
+        print("Net profit margin: unavailable")
+    else:
+        print(f"Net profit margin: {margin:.2%}")
