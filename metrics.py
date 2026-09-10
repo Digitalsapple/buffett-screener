@@ -14,3 +14,8 @@ def calculate_std_dev(margins):
     if len(margins) != 5 or None in margins:
         return None
     return pstdev(margins)
+
+def liability_to_asset_ratio(assets, liabilities):
+    if assets <= 0:
+        return None
+    return liabilities / assets

@@ -1,8 +1,8 @@
 import os
 import requests
 from datetime import date
-from metrics import CAGR, net_profit_margin, calculate_std_dev
-from financials import get_annual_records, get_unique_periods
+from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio
+from financials import get_annual_records, get_unique_periods, Asset_Liability
 
 def get_data(cik):
     contact = os.environ.get("EMAIL_CONTACT") #contact info is read from the environment variable EMAIL_CONTACT and stored in var "contact"
@@ -85,3 +85,23 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Margin consistency: unavailable")
     else:
         print(f"Margin consistency (std dev): {consistency * 100:.2f} percentage points")
+    
+
+    asset_records = data["facts"]["us-gaap"]["Assets"]["units"]["USD"]
+    liability_records = data["facts"]["us-gaap"]["Liabilities"]["units"]["USD"]
+    latest_end = latest_five[-1][1] #[-1] takes the latest (start, end) tuple, and then [1] takes the end date from the tuple
+    
+    latest_asset_record = Asset_Liability(asset_records, latest_end)
+    latest_liability_record = Asset_Liability(liability_records, latest_end)
+    if latest_asset_record is None or latest_liability_record is None:
+        print("Latest asset or liability record unavailable")
+    else:
+        print("Balance date:", latest_end)
+        print(f"Assets: ${latest_asset_record['val']:,}")
+        print(f"Liabilities: ${latest_liability_record['val']:,}")
+
+        ratio = liability_to_asset_ratio(latest_asset_record["val"], latest_liability_record["val"])
+        if ratio is None:
+            print("Liability to asset ratio: unavailable")
+        else:
+            print(f"Liability to asset ratio: {ratio:.2%}")

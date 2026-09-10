@@ -22,3 +22,14 @@ def get_unique_periods(records):
         elif record["filed"] > unique_periods[period]["filed"]: #if it IS already in the dictionary
             unique_periods[period] = record #update the value if the filed date is more recent
     return unique_periods
+
+def Asset_Liability(records, target_date):
+    selected = None
+    for record in records:
+        if record["end"] != target_date:
+            continue
+        if selected is None:
+            selected = record
+        elif record["filed"] > selected["filed"]:
+            selected = record
+    return selected
