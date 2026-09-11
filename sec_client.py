@@ -17,6 +17,14 @@ def get_data(cik):
     return response.json() #return the response in JSON format
 
 if __name__ == "__main__": #this is the main function that runs when code is executed 
+    roe_points = None
+    margin_points = None
+    consistency_points = None
+    ratio_points = None
+    fcf_points = None
+    revenue_growth_points = None
+    earnings_growth_points = None
+
     data = get_data(320193)
 
     annual_records = get_annual_records(data["facts"]["us-gaap"]["NetIncomeLoss"]["units"]["USD"]) #get the annual records from the data
@@ -169,3 +177,23 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
     else:
         print("Years with positive free cash flow:", positive_fcf_years, "/ 5")
         print("Free cash flow points:", fcf_points, "/ 20")
+
+
+    
+    scores = {
+        "Return on equity": roe_points,
+        "Net profit margin": margin_points,
+        "Margin consistency": consistency_points,
+        "Liabilities to assets": ratio_points,
+        "Positive free cash flow": fcf_points,
+        "Revenue growth": revenue_growth_points,
+        "Earnings growth": earnings_growth_points
+    }
+    for name, points in scores.items():
+        print(name, ":", points)
+
+    if None in scores.values():
+        print("Total score unavailable: one or more indicators are missing")
+    else:
+        total_score = sum(scores.values())
+        print("Total score:", total_score, "/ 100")
