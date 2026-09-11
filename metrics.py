@@ -25,3 +25,6 @@ def return_on_equity(net_income, openingEQ, closingEQ):
         return None
     avrgEQ = (openingEQ + closingEQ) / 2
     return net_income / avrgEQ
+
+def free_cash_flow(operating_cash, capex):
+    return operating_cash - capex

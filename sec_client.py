@@ -1,7 +1,7 @@
 import os
 import requests
 from datetime import date
-from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio, return_on_equity
+from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio, return_on_equity, free_cash_flow
 from financials import get_annual_records, get_unique_periods, get_balance_on_date
 
 def get_data(cik):
@@ -128,3 +128,29 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         else:
             print(f"Return on equity: {roe:.2%}")
 
+
+    #Free Cash Flow
+    operating_cash_records = data["facts"]["us-gaap"]["NetCashProvidedByUsedInOperatingActivities"]["units"]["USD"]
+    capital_expenditure_records = data["facts"]["us-gaap"]["PaymentsToAcquirePropertyPlantAndEquipment"]["units"]["USD"]
+    unique_operating_cash = get_unique_periods(get_annual_records(operating_cash_records))
+    unique_capex = get_unique_periods(get_annual_records(capital_expenditure_records))
+
+    #calculate free cash flow
+    positive_fcf_years = 0
+    available_fcf_years = 0
+
+    for period in latest_five:
+        if period not in unique_operating_cash or period not in unique_capex:
+            print(period[1], "Missing cash-flow data")
+        else:
+            operating_cash = unique_operating_cash[period]["val"]
+            capex = unique_capex[period]["val"]
+            fcf = free_cash_flow(operating_cash, capex)
+            available_fcf_years += 1
+            if fcf > 0:
+                positive_fcf_years += 1
+            print(period[1], f"Free cash flow: ${fcf:,}")
+    if available_fcf_years == 5:
+        print(f"Years with positive free cash flow: {positive_fcf_years}/ 5")
+    else:
+        print("Free-cash-flow indicator unavailable: need 5 complete years")
