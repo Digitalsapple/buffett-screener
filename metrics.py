@@ -19,3 +19,9 @@ def liability_to_asset_ratio(assets, liabilities):
     if assets <= 0:
         return None
     return liabilities / assets
+
+def return_on_equity(net_income, openingEQ, closingEQ):
+    if openingEQ <= 0 or closingEQ <= 0:
+        return None
+    avrgEQ = (openingEQ + closingEQ) / 2
+    return net_income / avrgEQ

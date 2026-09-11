@@ -23,7 +23,7 @@ def get_unique_periods(records):
             unique_periods[period] = record #update the value if the filed date is more recent
     return unique_periods
 
-def Asset_Liability(records, target_date):
+def get_balance_on_date(records, target_date):
     selected = None
     for record in records:
         if record["end"] != target_date:
