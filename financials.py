@@ -33,3 +33,10 @@ def get_balance_on_date(records, target_date):
         elif record["filed"] > selected["filed"]:
             selected = record
     return selected
+
+def filter_dates(records, cutoff_date):
+    eligible_records = []
+    for record in records:
+        if record["filed"] < cutoff_date: #checks if the filing date is PRIOR to the cutoff date
+            eligible_records.append(record) #if so, then add to eligible records list
+    return eligible_records
