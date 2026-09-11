@@ -1,7 +1,8 @@
 def score_ROE(roe):
     if roe is None:
-        return 0
-    elif roe >= 0.15:
+        return None
+
+    if roe >= 0.15:
         return 20
     elif roe >= 0.10:
         return 10
