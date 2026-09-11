@@ -3,6 +3,7 @@ import requests
 from datetime import date
 from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio, return_on_equity, free_cash_flow
 from financials import get_annual_records, get_unique_periods, get_balance_on_date
+from scoring import score_ROE, score_net_margin, score_margin_consistency, score_liabilities_to_assets
 
 def get_data(cik):
     contact = os.environ.get("EMAIL_CONTACT") #contact info is read from the environment variable EMAIL_CONTACT and stored in var "contact"
@@ -68,6 +69,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Net profit margin: unavailable")
     else:
         print(f"Net profit margin: {margin:.2%}")
+        margin_points = score_net_margin(margin)
+        print(f"Net margin points: {margin_points} / 15")
     
     #NET PROFIT MARGIN CONSISTENCY
     margins = []
@@ -86,7 +89,9 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Margin consistency: unavailable")
     else:
         print(f"Margin consistency (std dev): {consistency * 100:.2f} percentage points")
-    
+        consistency_points = score_margin_consistency(consistency)
+        print("Margin consistency points:", consistency_points, "/ 10")
+
     # ASSET LIABILITY RATIO
     asset_records = data["facts"]["us-gaap"]["Assets"]["units"]["USD"]
     liability_records = data["facts"]["us-gaap"]["Liabilities"]["units"]["USD"]
@@ -106,6 +111,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
             print("Liability to asset ratio: unavailable")
         else:
             print(f"Liability to asset ratio: {ratio:.2%}")
+            ratio_points = score_liabilities_to_assets(ratio)
+            print("Liabilities to assets points:", ratio_points, "/ 15")
     
     #RETURN ON EQUITY (ROE)
     equity_records = data["facts"]["us-gaap"]["StockholdersEquity"]["units"]["USD"]
@@ -127,6 +134,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
             print("Return on equity: unavailable")
         else:
             print(f"Return on equity: {roe:.2%}")
+            roe_points = score_ROE(roe)
+            print("ROE points:", roe_points, "/ 20")
 
 
     #Free Cash Flow
