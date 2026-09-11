@@ -3,7 +3,7 @@ import requests
 from datetime import date
 from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio, return_on_equity, free_cash_flow
 from financials import get_annual_records, get_unique_periods, get_balance_on_date
-from scoring import score_ROE, score_net_margin, score_margin_consistency, score_liabilities_to_assets
+from scoring import score_ROE, score_net_margin, score_margin_consistency, score_liabilities_to_assets, score_positive_fcf, score_growth
 
 def get_data(cik):
     contact = os.environ.get("EMAIL_CONTACT") #contact info is read from the environment variable EMAIL_CONTACT and stored in var "contact"
@@ -38,6 +38,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Annualized earnings growth: unavailable")
     else:
         print(f"Annualized earnings growth: {growth:.2%}")
+        earnings_growth_points = score_growth(growth)
+        print("Earnings growth points:", earnings_growth_points, "/ 10")
     
     #ANNUALIZED_REVENUE_GROWTH
     revenue_records = data["facts"]["us-gaap"]["RevenueFromContractWithCustomerExcludingAssessedTax"]["units"]["USD"]
@@ -59,6 +61,8 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
         print("Annualized revenue growth: unavailable")
     else:
         print(f"Annualized revenue growth: {revenue_growth:.2%}")
+        revenue_growth_points = score_growth(revenue_growth)
+        print("Revenue growth points:", revenue_growth_points, "/ 10")
 
     #NET PROFIT MARGIN
     latest_period = latest_five[-1]
@@ -159,7 +163,9 @@ if __name__ == "__main__": #this is the main function that runs when code is exe
             if fcf > 0:
                 positive_fcf_years += 1
             print(period[1], f"Free cash flow: ${fcf:,}")
-    if available_fcf_years == 5:
-        print(f"Years with positive free cash flow: {positive_fcf_years}/ 5")
-    else:
+    fcf_points = score_positive_fcf(positive_fcf_years, available_fcf_years)
+    if fcf_points is None:
         print("Free-cash-flow indicator unavailable: need 5 complete years")
+    else:
+        print("Years with positive free cash flow:", positive_fcf_years, "/ 5")
+        print("Free cash flow points:", fcf_points, "/ 20")

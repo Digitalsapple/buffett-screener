@@ -37,3 +37,18 @@ def score_liabilities_to_assets(ratio):
         return 8
     else:
         return 0
+
+def score_positive_fcf(positive_years, available_years):
+    if available_years != 5:
+        return None
+    return positive_years * 4
+
+def score_growth(growth):
+    if growth is None:
+        return None
+    elif growth >= 0.08:
+        return 10
+    elif growth >= 0.03:
+        return 5
+    else:
+        return 0
