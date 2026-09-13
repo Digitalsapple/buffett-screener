@@ -1,0 +1,54 @@
+cutoff_date,company,reason
+2022-09-10,NVIDIA,Incomplete indicators
+2022-09-10,Newmont,Incomplete indicators
+2022-09-10,Howmet Aerospace,Incomplete indicators
+2022-09-10,Eaton,Incomplete indicators
+2022-09-10,ServiceNow,Incomplete indicators
+2022-09-10,Vertiv,Incomplete indicators
+2022-09-10,Johnson & Johnson,Incomplete indicators
+2022-09-10,Oracle,Incomplete indicators
+2022-09-10,AMD,Incomplete indicators
+2022-09-10,Tesla,Incomplete indicators
+2022-09-10,Home Depot,Incomplete indicators
+2022-09-10,Marathon Petroleum,"('2017-01-01', '2017-12-31')"
+2022-09-10,Motorola Solutions,Incomplete indicators
+2022-09-10,Autodesk,Incomplete indicators
+2022-09-10,Ecolab,"('2007-01-01', '2007-12-31')"
+2022-09-10,Agilent Technologies,list index out of range
+2022-09-10,SLB,Incomplete indicators
+2022-09-10,Edwards Lifesciences,list index out of range
+2022-09-10,Cencora,Incomplete indicators
+2022-09-10,Sysco,"('2009-06-28', '2010-07-03')"
+2023-09-10,NVIDIA,Incomplete indicators
+2023-09-10,Newmont,Incomplete indicators
+2023-09-10,ServiceNow,Incomplete indicators
+2023-09-10,Amazon,Incomplete indicators
+2023-09-10,Fortinet,Incomplete indicators
+2023-09-10,Vertiv,Incomplete indicators
+2023-09-10,Johnson & Johnson,Incomplete indicators
+2023-09-10,Oracle,Incomplete indicators
+2023-09-10,AT&T,Incomplete indicators
+2023-09-10,Tesla,Incomplete indicators
+2023-09-10,Home Depot,Incomplete indicators
+2023-09-10,CVS Health,Incomplete indicators
+2023-09-10,Motorola Solutions,Incomplete indicators
+2023-09-10,Autodesk,Incomplete indicators
+2023-09-10,Ecolab,"('2007-01-01', '2007-12-31')"
+2023-09-10,Agilent Technologies,Incomplete indicators
+2023-09-10,Williams Companies,Incomplete indicators
+2023-09-10,Edwards Lifesciences,list index out of range
+2023-09-10,Cencora,Incomplete indicators
+2023-09-10,Sysco,"('2010-07-04', '2011-07-02')"
+2024-09-10,NVIDIA,Incomplete indicators
+2024-09-10,Newmont,Incomplete indicators
+2024-09-10,Micron,Incomplete indicators
+2024-09-10,Fortinet,Incomplete indicators
+2024-09-10,Vertiv,Incomplete indicators
+2024-09-10,Tesla,Incomplete indicators
+2024-09-10,Ecolab,"('2009-01-01', '2009-12-31')"
+2024-09-10,Agilent Technologies,Incomplete indicators
+2024-09-10,Devon Energy,Incomplete indicators
+2024-09-10,SLB,Incomplete indicators
+2024-09-10,Edwards Lifesciences,Incomplete indicators
+2024-09-10,Targa Resources,Incomplete indicators
+2024-09-10,Cencora,Incomplete indicators

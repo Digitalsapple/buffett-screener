@@ -28,4 +28,4 @@ def get_top_tickers(cutoff_date, top_n=10):
         name = company["name"]
         ticker = tickers[name]
         top_tickers.append(ticker)
-    return top_tickers, top_companies, failed
+    return top_tickers, top_companies, failed, results

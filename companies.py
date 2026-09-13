@@ -207,3 +207,9 @@ tickers = {
     "Cencora": "COR",
     "Sysco": "SYY",
 }
+
+cutoff_dates = [
+    "2022-09-10",
+    "2023-09-10",
+    "2024-09-10"
+]

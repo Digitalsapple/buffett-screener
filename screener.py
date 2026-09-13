@@ -3,7 +3,10 @@ from financials import get_annual_records, get_unique_periods, get_balance_on_da
 from scoring import score_ROE, score_net_margin, score_margin_consistency, score_liabilities_to_assets, score_positive_fcf, score_growth
 from datetime import date
 
-def analyze_company(data, cutoff_date):
+def analyze_company(data, cutoff_date, verbose=False):
+    def debug(*args, **kwargs):
+        if verbose:
+            print(*args, **kwargs)
     roe_points = None
     margin_points = None
     consistency_points = None
@@ -29,7 +32,7 @@ def analyze_company(data, cutoff_date):
     growth = CAGR(first_income, last_income, len(latest_five) - 1) #calculate the CAGR using the first and last income and the number of intervals
 
     if growth is None:
-        print("Annualized earnings growth: unavailable")
+        debug("Annualized earnings growth: unavailable")
     else:
         earnings_growth_points = score_growth(growth)
     
@@ -40,13 +43,13 @@ def analyze_company(data, cutoff_date):
         if period in unique_revenue:
             record = unique_revenue[period]
         else:
-            print("Missing revenue for:", period)
+            debug("Missing revenue for:", period)
     
     first_revenue = unique_revenue[latest_five[0]]["val"]
     last_revenue = unique_revenue[latest_five[-1]]["val"]
     revenue_growth = CAGR(first_revenue, last_revenue, len(latest_five) - 1)
     if revenue_growth is None:
-        print("Annualized revenue growth: unavailable")
+        debug("Annualized revenue growth: unavailable")
     else:
         revenue_growth_points = score_growth(revenue_growth)
 
@@ -56,7 +59,7 @@ def analyze_company(data, cutoff_date):
     revenue = unique_revenue[latest_period]["val"]
     margin = net_profit_margin(income, revenue)
     if margin is None:
-        print("Net profit margin: unavailable")
+        debug("Net profit margin: unavailable")
     else:
         margin_points = score_net_margin(margin)
     
@@ -68,11 +71,11 @@ def analyze_company(data, cutoff_date):
         margin = net_profit_margin(income, revenue)
         margins.append(margin)
         if margin is None:
-            print(f"{period[1]}, Margin unavailable")
+            debug(f"{period[1]}, Margin unavailable")
     
     consistency = calculate_std_dev(margins)
     if consistency is None:
-        print("Margin consistency: unavailable")
+        debug("Margin consistency: unavailable")
     else:
         consistency_points = score_margin_consistency(consistency)
 
@@ -95,7 +98,7 @@ def analyze_company(data, cutoff_date):
         eligible_liabilities = filter_dates(liability_records, cutoff_date)
         latest_liability_record = get_balance_on_date(eligible_liabilities,latest_end)
     if latest_asset_record is None:
-        print("Assets unavailable")
+        debug("Assets unavailable")
     else:
         assets = latest_asset_record["val"]
         if latest_liability_record is not None:
@@ -105,11 +108,11 @@ def analyze_company(data, cutoff_date):
         else:
             liabilities = None
         if liabilities is None:
-            print("Liabilities unavailable")
+            debug("Liabilities unavailable")
         else:
             ratio = liability_to_asset_ratio(assets,liabilities)
             if ratio is None:
-                print("Liability to asset ratio: unavailable")
+                debug("Liability to asset ratio: unavailable")
             else:
                 ratio_points = score_liabilities_to_assets(ratio)
     
@@ -122,12 +125,12 @@ def analyze_company(data, cutoff_date):
     closingEQ = get_balance_on_date(eligible_equity, closingDATE)
 
     if openingEQ is None or closingEQ is None:
-        print("Equity unavailable")
+        debug("Equity unavailable")
     else:
         latest_income = unique_periods[latest_five[-1]]['val']
         roe = return_on_equity(latest_income, openingEQ["val"], closingEQ["val"])
         if roe is None:
-            print("Return on equity: unavailable")
+            debug("Return on equity: unavailable")
         else:
             roe_points = score_ROE(roe)
 
@@ -156,11 +159,11 @@ def analyze_company(data, cutoff_date):
                 capex_record = record
                 break
         if operating_record is None or capex_record is None: # DEBUG CASH FLOW ERROR
-            print(end_date, "Missing cash-flow data")
+            debug(end_date, "Missing cash-flow data")
             if operating_record is None:
-                print("  -> Missing operating cash flow")
+                debug("  -> Missing operating cash flow")
             if capex_record is None:
-                print("  -> Missing CAPEX")
+                debug("  -> Missing CAPEX")
         else:
             operating_cash = operating_record["val"]
             capex = capex_record["val"]
@@ -171,7 +174,7 @@ def analyze_company(data, cutoff_date):
     #ends here
     fcf_points = score_positive_fcf(positive_fcf_years, available_fcf_years)
     if fcf_points is None:
-        print("Free-cash-flow indicator unavailable: need 5 complete years")
+        debug("Free-cash-flow indicator unavailable: need 5 complete years")
 
 
     
@@ -187,7 +190,7 @@ def analyze_company(data, cutoff_date):
     
     total_score = None
     if None in scores.values():
-        print("Total score unavailable, one or more indicators are missing")
+        debug("Total score unavailable, one or more indicators are missing")
     else:
         total_score = sum(scores.values())
     
