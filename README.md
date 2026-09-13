@@ -33,16 +33,16 @@ The project uses financial-data retrieval, historical filing filters, transparen
 5. Calculate seven indicators
    `metrics.py` contains the calculations. Each indicator answers a different question about the company.
 
-| Indicator                   | Calculation                                                                    | Scoring criteria                                                                                                               |
-| --------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Return on equity**        | Latest annual net income Ã· average opening and closing shareholdersâ€™ equity | **20 points:** â‰¥ 15%<br>**10 points:** â‰¥ 10% and < 15%<br>**0 points:** < 10%                                              |
-| **Net profit margin**       | Latest annual net income Ã· revenue                                            | **15 points:** â‰¥ 15%<br>**8 points:** â‰¥ 10% and < 15%<br>**0 points:** < 10%                                               |
-| **Margin consistency**      | Population standard deviation of five annual net profit margins                | **10 points:** â‰¤ 3 percentage points<br>**5 points:** > 3 and â‰¤ 6 percentage points<br>**0 points:** > 6 percentage points |
-| **Liabilities to assets**   | Liabilities Ã· assets at the selected year-end                                 | **15 points:** â‰¤ 50%<br>**8 points:** > 50% and â‰¤ 70%<br>**0 points:** > 70%                                               |
-| **Positive free cash flow** | Number of years in which operating cash flow âˆ’ capital expenditure > 0       | **4 points per positive year**, up to **20 points**.<br>Requires data for all five years.                                      |
-| **Revenue growth**          | Annualized growth between the first and last selected revenue observations     | **10 points:** â‰¥ 8%<br>**5 points:** â‰¥ 3% and < 8%<br>**0 points:** < 3%                                                   |
-| **Earnings growth**         | Annualized growth between the first and last selected net-income observations  | **10 points:** â‰¥ 8%<br>**5 points:** â‰¥ 3% and < 8%<br>**0 points:** < 3%                                                   |
-| **Maximum score**           |                                                                                | **100 points**                                                                                                                 |
+| Indicator                   | Calculation                                                                   | Scoring criteria                                                                                                           |
+| --------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Return on equity**        | Latest annual net income ÷ average opening and closing shareholders’ equity   | **20 points:** ≥ 15%<br>**10 points:** ≥ 10% and < 15%<br>**0 points:** < 10%                                              |
+| **Net profit margin**       | Latest annual net income ÷ revenue                                            | **15 points:** ≥ 15%<br>**8 points:** ≥ 10% and < 15%<br>**0 points:** < 10%                                               |
+| **Margin consistency**      | Population standard deviation of five annual net profit margins               | **10 points:** ≤ 3 percentage points<br>**5 points:** > 3 and ≤ 6 percentage points<br>**0 points:** > 6 percentage points |
+| **Liabilities to assets**   | Liabilities ÷ assets at the selected year-end                                 | **15 points:** ≤ 50%<br>**8 points:** > 50% and ≤ 70%<br>**0 points:** > 70%                                               |
+| **Positive free cash flow** | Number of years in which operating cash flow − capital expenditure > 0        | **4 points per positive year**, up to **20 points**.<br>Requires data for all five years.                                  |
+| **Revenue growth**          | Annualized growth between the first and last selected revenue observations    | **10 points:** ≥ 8%<br>**5 points:** ≥ 3% and < 8%<br>**0 points:** < 3%                                                   |
+| **Earnings growth**         | Annualized growth between the first and last selected net-income observations | **10 points:** ≥ 8%<br>**5 points:** ≥ 3% and < 8%<br>**0 points:** < 3%                                                   |
+| **Maximum score**           |                                                                               | **100 points**                                                                                                             |
 
     *Missing data or undefined calculations are marked unavailable, not assigned zero points. A total score requires all seven component scores.*
 
