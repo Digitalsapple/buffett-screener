@@ -1,5 +1,5 @@
 from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio, return_on_equity, free_cash_flow
-from financials import get_annual_records, get_unique_periods, get_balance_on_date, filter_dates
+from financials import get_annual_records, get_unique_periods, get_balance_on_date, filter_dates, get_revenue_periods, get_capex_periods
 from scoring import score_ROE, score_net_margin, score_margin_consistency, score_liabilities_to_assets, score_positive_fcf, score_growth
 from datetime import date
 
@@ -34,10 +34,7 @@ def analyze_company(data, cutoff_date):
         earnings_growth_points = score_growth(growth)
     
     #ANNUALIZED_REVENUE_GROWTH
-    revenue_records = data["facts"]["us-gaap"]["RevenueFromContractWithCustomerExcludingAssessedTax"]["units"]["USD"]
-    eligible_revenue = filter_dates(revenue_records, cutoff_date)
-    annual_revenue = get_annual_records(eligible_revenue)
-    unique_revenue = get_unique_periods(annual_revenue)
+    unique_revenue = get_revenue_periods(data, cutoff_date)
 
     for period in latest_five:
         if period in unique_revenue:
@@ -120,27 +117,41 @@ def analyze_company(data, cutoff_date):
 
     #Free Cash Flow
     operating_cash_records = data["facts"]["us-gaap"]["NetCashProvidedByUsedInOperatingActivities"]["units"]["USD"]
-    capital_expenditure_records = data["facts"]["us-gaap"]["PaymentsToAcquirePropertyPlantAndEquipment"]["units"]["USD"]
-    
+
     eligible_operating_cash = filter_dates(operating_cash_records, cutoff_date)
-    eligible_capex = filter_dates(capital_expenditure_records, cutoff_date)
     unique_operating_cash = get_unique_periods(get_annual_records(eligible_operating_cash))
-    unique_capex = get_unique_periods(get_annual_records(eligible_capex))
+
+    unique_capex = get_capex_periods(data, cutoff_date)
 
     #calculate free cash flow
     positive_fcf_years = 0
     available_fcf_years = 0
 
+    #NEW CODE TO SOLVE THE NVIDIA EDGE CASE
+    #TODO: investigate historical NVIDIA CAPEX tags for backtesting
     for period in latest_five:
-        if period not in unique_operating_cash or period not in unique_capex:
-            print(period[1], "Missing cash-flow data")
+        end_date = period[1]
+        operating_record = None
+        capex_record = None
+
+        for cash_period, record in unique_operating_cash.items():
+            if cash_period[1] == end_date:
+                operating_record = record
+                break
+        for capex_period, record in unique_capex.items():
+            if capex_period[1] == end_date:
+                capex_record = record
+                break
+        if operating_record is None or capex_record is None:
+            print(end_date, "Missing cash-flow data")
         else:
-            operating_cash = unique_operating_cash[period]["val"]
-            capex = unique_capex[period]["val"]
+            operating_cash = operating_record["val"]
+            capex = capex_record["val"]
             fcf = free_cash_flow(operating_cash, capex)
             available_fcf_years += 1
             if fcf > 0:
                 positive_fcf_years += 1
+    #ends here
     fcf_points = score_positive_fcf(positive_fcf_years, available_fcf_years)
     if fcf_points is None:
         print("Free-cash-flow indicator unavailable: need 5 complete years")

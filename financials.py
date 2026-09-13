@@ -40,3 +40,42 @@ def filter_dates(records, cutoff_date):
         if record["filed"] < cutoff_date: #checks if the filing date is PRIOR to the cutoff date
             eligible_records.append(record) #if so, then add to eligible records list
     return eligible_records
+
+
+#DEBUGGING AND TESTING
+def get_revenue_periods(data, cutoff_date):
+    revenue_tags = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"]
+    combined_revenue = {}
+    for tag in revenue_tags:
+        if tag not in data["facts"]["us-gaap"]:
+            continue
+        records = data["facts"]["us-gaap"][tag]["units"].get("USD", [])
+        eligible_records = filter_dates(records, cutoff_date)
+        annual_records = get_annual_records(eligible_records)
+        unique_periods = get_unique_periods(annual_records)
+        combined_revenue.update(unique_periods)
+    return combined_revenue
+
+def get_capex_periods(data, cutoff_date):
+    capex_tags = [
+        "PaymentsToAcquirePropertyPlantAndEquipment",
+        "PaymentsToAcquireProductiveAssets"
+    ]
+
+    combined_capex = {}
+
+    for tag in capex_tags:
+        if tag not in data["facts"]["us-gaap"]:
+            continue
+
+        records = data["facts"]["us-gaap"][tag]["units"].get("USD", [])
+
+        eligible_records = filter_dates(records, cutoff_date)
+        annual_records = get_annual_records(eligible_records)
+        unique_periods = get_unique_periods(annual_records)
+
+        for period, record in unique_periods.items():
+            if period not in combined_capex:
+                combined_capex[period] = record
+
+    return combined_capex
