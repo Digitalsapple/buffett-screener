@@ -17,37 +17,143 @@ if __name__ == "__main__": ##this is the main function that runs when code is ex
     from screener import analyze_company
 
     companies = {
-        "Apple": 320193,
         "Microsoft": 789019,
-        "NVIDIA": 1045810,
-        "AMD": 2488,
-        "Amazon": 1018724,
-        "Coca-Cola": 21344,
-        "JPMorgan": 19617,
-        "Walmart": 104169,
-        "Netflix": 1065280,
-        "Tesla": 1318605,
-        "Ford": 37996,
-        "Costco": 909832,
+        "Alphabet": 1652044,
+        "Meta": 1326801,
+        "Mastercard": 1141391,
+        "Lam Research": 707549,
+        "Arista Networks": 1596532,
+        "Intuitive Surgical": 1035267,
         "Adobe": 796343,
+        "KLA": 319201,
+        "Amphenol": 820313,
+        "NVIDIA": 1045810,
+        "Applied Materials": 6951,
+        "Newmont": 1164727,
+        "Howmet Aerospace": 4281,
+        "Eaton": 1551182,
+        "Vertex Pharmaceuticals": 875320,
+        "Parker-Hannifin": 76334,
+        "Netflix": 1065280,
+        "Coca-Cola": 21344,
+        "Thermo Fisher Scientific": 97745,
+        "Micron": 723125,
+        "ServiceNow": 1373715,
+        "Accenture": 1467373,
+        "Amazon": 1018724,
+        "Salesforce": 1108524,
+        "Fortinet": 1262039,
+        "Costco": 909832,
+        "Cisco": 858877,
+        "Merck": 310158,
+        "Disney": 1744489,
+        "Vertiv": 1674101,
+        "Apple": 320193,
         "Analog Devices": 6281,
+        "IBM": 51143,
+        "Amgen": 318154,
+        "Walmart": 104169,
+        "Johnson & Johnson": 200406,
+        "Procter & Gamble": 80424,
+        "Gilead Sciences": 882095,
+        "General Dynamics": 40533,
+        "Oracle": 1341439,
+        "AMD": 2488,
+        "RTX": 101829,
+        "Union Pacific": 100885,
+        "Texas Instruments": 97476,
+        "T-Mobile": 1283699,
+        "Deere": 315189,
         "AT&T": 732717,
+        "PepsiCo": 77476,
+        "Abbott": 1800,
+        "Tesla": 1318605,
+        "Chevron": 93410,
+        "Caterpillar": 18230,
+        "Home Depot": 354950,
+        "Lockheed Martin": 936468,
+        "Marathon Petroleum": 1510295,
+        "Danaher": 313616,
+        "Bristol Myers Squibb": 14272,
+        "CVS Health": 64803,
+        "Ford": 37996,
+        "Pfizer": 78003,
+
+        "Intuit": 896878,
+        "Garmin": 1121788,
+        "HEICO": 46619,
+        "Fastenal": 815556,
+        "Cintas": 723254,
+        "Monolithic Power Systems": 1280452,
+        "IDEXX Laboratories": 874716,
+        "Republic Services": 1060391,
+        "Comfort Systems USA": 1035983,
+        "Chipotle": 1058090,
+        "Motorola Solutions": 68505,
+        "Autodesk": 769397,
+        "Paychex": 723531,
+        "Wabtec": 943452,
+        "Ecolab": 31462,
+        "Agilent Technologies": 1090872,
+        "Comcast": 1166691,
+        "Waste Management": 823768,
+        "W.W. Grainger": 277135,
+        "Devon Energy": 1090012,
+        "ONEOK": 1039684,
+        "Johnson Controls": 833444,
+        "Waste Connections": 1318220,
+        "Teradyne": 97210,
+        "PayPal": 1633917,
+        "Sherwin-Williams": 89800,
+        "Williams Companies": 107263,
+        "Synopsys": 883241,
+        "SLB": 87347,
+        "Ross Stores": 745732,
+        "Delta Air Lines": 27904,
+        "Rockwell Automation": 1024478,
+        "Moody's": 1059556,
+        "Edwards Lifesciences": 1099800,
+        "Colgate-Palmolive": 21665,
+        "Kinder Morgan": 1506307,
+        "Targa Resources": 1389170,
+        "Regeneron": 872589,
+        "Cencora": 1140859,
+        "Sysco": 96021,
     }
 
     cutoff_date = "2026-09-10"
+
     results = []
+    failed = []
 
     for name, cik in companies.items():
         print("\nAnalyzing", name)
-        data = get_data(cik)
-        result = analyze_company(data, cutoff_date)
 
-        if result["total_score"] is not None:
-            results.append(result)
-        else:
-            print(result["company"], "skipped: incomplete or unsupported financial data")
+        try:
+            data = get_data(cik)
+            result = analyze_company(data, cutoff_date)
 
-    results.sort(key=lambda company: company["total_score"], reverse=True)
+            if result["total_score"] is not None:
+                results.append(result)
+            else:
+                failed.append({
+                    "company": name,
+                    "reason": "Incomplete financial indicators"
+                })
+
+        except Exception as error:
+            failed.append({
+                "company": name,
+                "reason": str(error)
+            })
+
+            print(name, "FAILED:", error)
+    
+    results.sort(
+        key=lambda company: company["total_score"],
+        reverse=True
+    )
+
     print("\nFINAL RANKING")
 
     for rank, company in enumerate(results, start=1):
@@ -56,4 +162,18 @@ if __name__ == "__main__": ##this is the main function that runs when code is ex
             company["company"],
             company["total_score"],
             "/ 100"
+        )
+    
+    print("\nSUMMARY")
+    print("Companies attempted:", len(companies))
+    print("Successfully scored:", len(results))
+    print("Failed/skipped:", len(failed))
+
+    print("\nFAILED COMPANIES")
+
+    for company in failed:
+        print(
+            company["company"],
+            "-",
+            company["reason"]
         )
