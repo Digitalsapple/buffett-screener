@@ -16,9 +16,7 @@ def get_data(cik):
 if __name__ == "__main__": ##this is the main function that runs when code is executed
     from screener import analyze_company
 
-    data = get_data(320193)
+    data = get_data(789019)
     result = analyze_company(data, "2026-09-10")
 
     print("Returned company:", result["company"])
-    print("Returned total:", result["total_score"])
-    print(result["indicators"])

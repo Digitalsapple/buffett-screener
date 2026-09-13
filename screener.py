@@ -23,10 +23,6 @@ def analyze_company(data, cutoff_date):
     sorted_periods = sorted(unique_periods)
     latest_five = sorted_periods[-5:] #get the last five periods
 
-    for period in latest_five:
-        record = unique_periods[period]
-        print(record["start"], record["end"], f"${record['val']:,}") #print the net income for the last five periods
-
     #ANNUALIZED EARNINGS GROWTH
     first_income = unique_periods[latest_five[0]]["val"]
     last_income = unique_periods[latest_five[-1]]["val"]
@@ -35,21 +31,17 @@ def analyze_company(data, cutoff_date):
     if growth is None:
         print("Annualized earnings growth: unavailable")
     else:
-        print(f"Annualized earnings growth: {growth:.2%}")
         earnings_growth_points = score_growth(growth)
-        print("Earnings growth points:", earnings_growth_points, "/ 10")
     
     #ANNUALIZED_REVENUE_GROWTH
     revenue_records = data["facts"]["us-gaap"]["RevenueFromContractWithCustomerExcludingAssessedTax"]["units"]["USD"]
     eligible_revenue = filter_dates(revenue_records, cutoff_date)
     annual_revenue = get_annual_records(eligible_revenue)
     unique_revenue = get_unique_periods(annual_revenue)
-    print("Unique annual revenue periods:", len(unique_revenue))
 
     for period in latest_five:
         if period in unique_revenue:
             record = unique_revenue[period]
-            print(record["start"], record["end"], f"${record["val"]:,}")
         else:
             print("Missing revenue for:", period)
     
@@ -59,9 +51,7 @@ def analyze_company(data, cutoff_date):
     if revenue_growth is None:
         print("Annualized revenue growth: unavailable")
     else:
-        print(f"Annualized revenue growth: {revenue_growth:.2%}")
         revenue_growth_points = score_growth(revenue_growth)
-        print("Revenue growth points:", revenue_growth_points, "/ 10")
 
     #NET PROFIT MARGIN
     latest_period = latest_five[-1]
@@ -71,9 +61,7 @@ def analyze_company(data, cutoff_date):
     if margin is None:
         print("Net profit margin: unavailable")
     else:
-        print(f"Net profit margin: {margin:.2%}")
         margin_points = score_net_margin(margin)
-        print(f"Net margin points: {margin_points} / 15")
     
     #NET PROFIT MARGIN CONSISTENCY
     margins = []
@@ -84,16 +72,12 @@ def analyze_company(data, cutoff_date):
         margins.append(margin)
         if margin is None:
             print(f"{period[1]}, Margin unavailable")
-        else:
-            print(f"{period[1]} Margin: {margin:.2%}")
     
     consistency = calculate_std_dev(margins)
     if consistency is None:
         print("Margin consistency: unavailable")
     else:
-        print(f"Margin consistency (std dev): {consistency * 100:.2f} percentage points")
         consistency_points = score_margin_consistency(consistency)
-        print("Margin consistency points:", consistency_points, "/ 10")
 
     # ASSET LIABILITY RATIO
     asset_records = data["facts"]["us-gaap"]["Assets"]["units"]["USD"]
@@ -108,21 +92,14 @@ def analyze_company(data, cutoff_date):
     if latest_asset_record is None or latest_liability_record is None:
         print("Latest asset or liability record unavailable")
     else:
-        print("Balance date:", latest_end)
-        print(f"Assets: ${latest_asset_record['val']:,}")
-        print(f"Liabilities: ${latest_liability_record['val']:,}")
-
         ratio = liability_to_asset_ratio(latest_asset_record["val"], latest_liability_record["val"])
         if ratio is None:
             print("Liability to asset ratio: unavailable")
         else:
-            print(f"Liability to asset ratio: {ratio:.2%}")
             ratio_points = score_liabilities_to_assets(ratio)
-            print("Liabilities to assets points:", ratio_points, "/ 15")
     
     #RETURN ON EQUITY (ROE)
     equity_records = data["facts"]["us-gaap"]["StockholdersEquity"]["units"]["USD"]
-    print(equity_records[-1])
     openingDATE = latest_five[-2][1]  # second last's record's end date
     closingDATE = latest_five[-1][1]  # last period's end date
 
@@ -133,16 +110,12 @@ def analyze_company(data, cutoff_date):
     if openingEQ is None or closingEQ is None:
         print("Equity unavailable")
     else:
-        print(f"Opening Equity: {openingDATE} ${openingEQ['val']:,}")
-        print(f"Closing Equity: {closingDATE} ${closingEQ['val']:,}")
         latest_income = unique_periods[latest_five[-1]]['val']
         roe = return_on_equity(latest_income, openingEQ["val"], closingEQ["val"])
         if roe is None:
             print("Return on equity: unavailable")
         else:
-            print(f"Return on equity: {roe:.2%}")
             roe_points = score_ROE(roe)
-            print("ROE points:", roe_points, "/ 20")
 
 
     #Free Cash Flow
@@ -168,13 +141,9 @@ def analyze_company(data, cutoff_date):
             available_fcf_years += 1
             if fcf > 0:
                 positive_fcf_years += 1
-            print(period[1], f"Free cash flow: ${fcf:,}")
     fcf_points = score_positive_fcf(positive_fcf_years, available_fcf_years)
     if fcf_points is None:
         print("Free-cash-flow indicator unavailable: need 5 complete years")
-    else:
-        print("Years with positive free cash flow:", positive_fcf_years, "/ 5")
-        print("Free cash flow points:", fcf_points, "/ 20")
 
 
     
