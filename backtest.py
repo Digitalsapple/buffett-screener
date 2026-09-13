@@ -1,6 +1,6 @@
 from sec_client import get_data
 from screener import analyze_company
-from companies import companies
+from companies import companies, tickers
 
 def rank_companies(companies, cutoff_date):
     results = []
@@ -17,7 +17,8 @@ def rank_companies(companies, cutoff_date):
                 failed.append({"company": name,"reason": "Incomplete indicators"})
         except Exception as error:
             failed.append({"company": name,"reason": str(error)})
-    results.sort(key=lambda company: company["total_score"],reverse=True)
+    results.sort(key=lambda company: (-company["total_score"],company["company"]) #tie-breaking debug added
+)
     return results, failed
 
 if __name__ == "__main__":
