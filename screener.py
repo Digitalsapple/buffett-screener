@@ -77,26 +77,45 @@ def analyze_company(data, cutoff_date):
         consistency_points = score_margin_consistency(consistency)
 
     # ASSET LIABILITY RATIO
+    # ASSET LIABILITY RATIO DEBUGGING FOR AMD
     asset_records = data["facts"]["us-gaap"]["Assets"]["units"]["USD"]
-    liability_records = data["facts"]["us-gaap"]["Liabilities"]["units"]["USD"]
-    latest_end = latest_five[-1][1] #[-1] takes the latest (start, end) tuple, and then [1] takes the end date from the tuple
-    
-    eligible_assets = filter_dates(asset_records, cutoff_date)
-    eligible_liabilities = filter_dates(liability_records, cutoff_date)
-    latest_asset_record = get_balance_on_date(eligible_assets, latest_end)
-    latest_liability_record = get_balance_on_date(eligible_liabilities, latest_end)
+    equity_records = data["facts"]["us-gaap"]["StockholdersEquity"]["units"]["USD"]
 
-    if latest_asset_record is None or latest_liability_record is None:
-        print("Latest asset or liability record unavailable")
+    eligible_assets = filter_dates(asset_records, cutoff_date)
+    eligible_equity = filter_dates(equity_records, cutoff_date)
+
+    latest_end = latest_five[-1][1]
+
+    latest_asset_record = get_balance_on_date(eligible_assets, latest_end)
+    latest_equity_record = get_balance_on_date(eligible_equity, latest_end)
+
+    latest_liability_record = None
+
+    # Use reported liabilities if available
+    if "Liabilities" in data["facts"]["us-gaap"]:
+        liability_records = data["facts"]["us-gaap"]["Liabilities"]["units"]["USD"]
+        eligible_liabilities = filter_dates(liability_records, cutoff_date)
+        latest_liability_record = get_balance_on_date(eligible_liabilities,latest_end)
+    if latest_asset_record is None:
+        print("Assets unavailable")
     else:
-        ratio = liability_to_asset_ratio(latest_asset_record["val"], latest_liability_record["val"])
-        if ratio is None:
-            print("Liability to asset ratio: unavailable")
+        assets = latest_asset_record["val"]
+        if latest_liability_record is not None:
+            liabilities = latest_liability_record["val"]
+        elif latest_equity_record is not None:
+            liabilities = assets - latest_equity_record["val"]
         else:
-            ratio_points = score_liabilities_to_assets(ratio)
+            liabilities = None
+        if liabilities is None:
+            print("Liabilities unavailable")
+        else:
+            ratio = liability_to_asset_ratio(assets,liabilities)
+            if ratio is None:
+                print("Liability to asset ratio: unavailable")
+            else:
+                ratio_points = score_liabilities_to_assets(ratio)
     
     #RETURN ON EQUITY (ROE)
-    equity_records = data["facts"]["us-gaap"]["StockholdersEquity"]["units"]["USD"]
     openingDATE = latest_five[-2][1]  # second last's record's end date
     closingDATE = latest_five[-1][1]  # last period's end date
 
