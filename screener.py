@@ -1,5 +1,5 @@
 from metrics import CAGR, net_profit_margin, calculate_std_dev, liability_to_asset_ratio, return_on_equity, free_cash_flow
-from financials import get_annual_records, get_unique_periods, get_balance_on_date, filter_dates, get_revenue_periods, get_capex_periods
+from financials import get_annual_records, get_unique_periods, get_balance_on_date, filter_dates, get_revenue_periods, get_capex_periods, get_operating_cash_periods, get_equity_records
 from scoring import score_ROE, score_net_margin, score_margin_consistency, score_liabilities_to_assets, score_positive_fcf, score_growth
 from datetime import date
 
@@ -77,13 +77,11 @@ def analyze_company(data, cutoff_date):
         consistency_points = score_margin_consistency(consistency)
 
     # ASSET LIABILITY RATIO
-    # ASSET LIABILITY RATIO DEBUGGING FOR AMD
     asset_records = data["facts"]["us-gaap"]["Assets"]["units"]["USD"]
-    equity_records = data["facts"]["us-gaap"]["StockholdersEquity"]["units"]["USD"]
+
 
     eligible_assets = filter_dates(asset_records, cutoff_date)
-    eligible_equity = filter_dates(equity_records, cutoff_date)
-
+    eligible_equity = get_equity_records(data, cutoff_date)
     latest_end = latest_five[-1][1]
 
     latest_asset_record = get_balance_on_date(eligible_assets, latest_end)
@@ -119,7 +117,7 @@ def analyze_company(data, cutoff_date):
     openingDATE = latest_five[-2][1]  # second last's record's end date
     closingDATE = latest_five[-1][1]  # last period's end date
 
-    eligible_equity = filter_dates(equity_records, cutoff_date)
+    eligible_equity = get_equity_records(data, cutoff_date)
     openingEQ = get_balance_on_date(eligible_equity, openingDATE)
     closingEQ = get_balance_on_date(eligible_equity, closingDATE)
 
@@ -135,11 +133,7 @@ def analyze_company(data, cutoff_date):
 
 
     #Free Cash Flow
-    operating_cash_records = data["facts"]["us-gaap"]["NetCashProvidedByUsedInOperatingActivities"]["units"]["USD"]
-
-    eligible_operating_cash = filter_dates(operating_cash_records, cutoff_date)
-    unique_operating_cash = get_unique_periods(get_annual_records(eligible_operating_cash))
-
+    unique_operating_cash = get_operating_cash_periods(data, cutoff_date)
     unique_capex = get_capex_periods(data, cutoff_date)
 
     #calculate free cash flow
@@ -161,8 +155,12 @@ def analyze_company(data, cutoff_date):
             if capex_period[1] == end_date:
                 capex_record = record
                 break
-        if operating_record is None or capex_record is None:
+        if operating_record is None or capex_record is None: # DEBUG CASH FLOW ERROR
             print(end_date, "Missing cash-flow data")
+            if operating_record is None:
+                print("  -> Missing operating cash flow")
+            if capex_record is None:
+                print("  -> Missing CAPEX")
         else:
             operating_cash = operating_record["val"]
             capex = capex_record["val"]

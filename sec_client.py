@@ -16,7 +16,44 @@ def get_data(cik):
 if __name__ == "__main__": ##this is the main function that runs when code is executed
     from screener import analyze_company
 
-    data = get_data(2488)
-    result = analyze_company(data, "2026-09-10")
+    companies = {
+        "Apple": 320193,
+        "Microsoft": 789019,
+        "NVIDIA": 1045810,
+        "AMD": 2488,
+        "Amazon": 1018724,
+        "Coca-Cola": 21344,
+        "JPMorgan": 19617,
+        "Walmart": 104169,
+        "Netflix": 1065280,
+        "Tesla": 1318605,
+        "Ford": 37996,
+        "Costco": 909832,
+        "Adobe": 796343,
+        "Analog Devices": 6281,
+        "AT&T": 732717,
+    }
 
-    print("Returned company:", result["company"])
+    cutoff_date = "2026-09-10"
+    results = []
+
+    for name, cik in companies.items():
+        print("\nAnalyzing", name)
+        data = get_data(cik)
+        result = analyze_company(data, cutoff_date)
+
+        if result["total_score"] is not None:
+            results.append(result)
+        else:
+            print(result["company"], "skipped: incomplete or unsupported financial data")
+
+    results.sort(key=lambda company: company["total_score"], reverse=True)
+    print("\nFINAL RANKING")
+
+    for rank, company in enumerate(results, start=1):
+        print(
+            rank,
+            company["company"],
+            company["total_score"],
+            "/ 100"
+        )
