@@ -1,48 +1,7 @@
 import yfinance as yf
 import pandas as pd
 from companies import companies, tickers
-
-portfolios = {
-    "2022-09-10": [
-        "INTU",
-        "GRMN",
-        "FAST",
-        "MPWR",
-        "GOOGL",
-        "META",
-        "MA",
-        "ISRG",
-        "ADBE",
-        "DHR",
-    ],
-
-    "2023-09-10": [
-        "MSFT",
-        "GRMN",
-        "FAST",
-        "MPWR",
-        "TER",
-        "SNPS",
-        "GOOGL",
-        "MA",
-        "ADBE",
-        "DHR",
-    ],
-
-    "2024-09-10": [
-        "MSFT",
-        "APH",
-        "AMAT",
-        "INTU",
-        "FAST",
-        "MPWR",
-        "SNPS",
-        "GOOGL",
-        "META",
-        "MA",
-    ],
-}
-
+from backtest import get_top_tickers
 
 def get_stock_return(ticker, cutoff_date):
     cutoff = pd.Timestamp(cutoff_date)
@@ -127,11 +86,19 @@ def backtest_portfolio(tickers, cutoff_date):
 
 if __name__ == "__main__":
     all_results = []
-    for cutoff_date, tickers in portfolios.items():
+
+    cutoff_dates = [
+        "2022-09-10",
+        "2023-09-10",
+        "2024-09-10"
+    ]
+
+    for cutoff_date in cutoff_dates:
+        top_tickers, top_companies, failed = get_top_tickers(cutoff_date)
         print("\n" + "=" * 60)
         print("BACKTEST:", cutoff_date)
         print("=" * 60)
-        result = backtest_portfolio(tickers,cutoff_date)
+        result = backtest_portfolio(top_tickers,cutoff_date)
 
         if result is None:
             print("Backtest failed.")

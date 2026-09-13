@@ -184,15 +184,12 @@ def analyze_company(data, cutoff_date):
         "Revenue growth": revenue_growth_points,
         "Earnings growth": earnings_growth_points
     }
-    for name, points in scores.items():
-        print(name, ":", points)
     
     total_score = None
     if None in scores.values():
         print("Total score unavailable, one or more indicators are missing")
     else:
         total_score = sum(scores.values())
-        print("Total score:", total_score, "/ 100")
     
     indicators = {
         "Return on equity": roe,
